@@ -1,0 +1,20 @@
+{#
+ luci-theme-ninux - footer
+ Licensed to the public under the Apache License 2.0.
+-#}
+
+		{% if (!blank_page): %}
+			</main>
+		</div>
+		<footer id="footer">
+			<a href="{{ entityencode(version.disturl ?? '#', true) }}" target="_blank" rel="noreferrer">{{ version.distname }} {{ version.distversion }}</a>
+			<span>·</span>
+			<a href="https://github.com/openwrt/luci" target="_blank" rel="noreferrer">{{ version.luciname }}</a>
+			{% if (lua_active): %}
+			<span>· {{ _('Lua compatibility mode active') }}</span>
+			{% endif %}
+		</footer>
+		<script>L.require('menu-ninux')</script>
+		{% endif %}
+	</body>
+</html>

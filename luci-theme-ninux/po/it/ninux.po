@@ -1,0 +1,29 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "%d%% of %s"
+msgstr "%d%% di %s"
+
+msgid "Advanced"
+msgstr "Avanzato"
+
+msgid "Basic"
+msgstr "Base"
+
+msgid "Interface mode"
+msgstr "Modalità dell'interfaccia"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Quick links"
+msgstr "Collegamenti rapidi"
+
+msgid "Show advanced menu"
+msgstr "Mostra il menu avanzato"
+
+msgid "This page is part of the advanced settings."
+msgstr "Questa pagina fa parte delle impostazioni avanzate."

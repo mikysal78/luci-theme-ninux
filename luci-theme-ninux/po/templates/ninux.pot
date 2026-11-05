@@ -1,0 +1,26 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+msgid "%d%% of %s"
+msgstr ""
+
+msgid "Advanced"
+msgstr ""
+
+msgid "Basic"
+msgstr ""
+
+msgid "Interface mode"
+msgstr ""
+
+msgid "Menu"
+msgstr ""
+
+msgid "Quick links"
+msgstr ""
+
+msgid "Show advanced menu"
+msgstr ""
+
+msgid "This page is part of the advanced settings."
+msgstr ""

@@ -1,0 +1,23 @@
+#!/bin/sh
+# Registra il tema e, alla prima installazione, lo rende quello predefinito.
+# Crea la sezione luci.ninux con i default, senza toccare valori già impostati
+# (per esempio da OpenWISP o dal firmware).
+
+changed=0
+
+if ! uci -q get luci.themes.Ninux >/dev/null; then
+	uci set luci.themes.Ninux=/luci-static/ninux
+	[ "$PKG_UPGRADE" != 1 ] && uci set luci.main.mediaurlbase=/luci-static/ninux
+	changed=1
+fi
+
+if ! uci -q get luci.ninux >/dev/null; then
+	uci set luci.ninux=ninux
+	uci set luci.ninux.default_mode=basic
+	uci set luci.ninux.allow_advanced=1
+	changed=1
+fi
+
+[ $changed = 1 ] && uci commit luci
+
+exit 0
