@@ -78,7 +78,7 @@ jobs:
           fetch-depth: 0
 
       - name: Compila
-        uses: openwrt/gh-action-sdk@v9
+        uses: openwrt/gh-action-sdk@f5813d30eeef3534b58ac7e79c5d8842b6035434  # main dopo v9: action Docker su Node 24
         env:
           ARCH: ${{ matrix.sdk }}
           FEEDNAME: ninux
