@@ -1,0 +1,158 @@
+name: CI
+
+# Ad ogni push e pull request: controlli e compilazione con l'SDK di OpenWrt
+# 24.10 (.ipk) e 25.12 (.apk). Su main, se PKG_VERSION del Makefile non ha
+# ancora il suo tag v<versione>, crea tag e Release con i pacchetti allegati.
+
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PKG: luci-theme-ninux
+
+jobs:
+  lint:
+    name: Controlli
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versione del pacchetto
+        id: version
+        run: |
+          version=$(sed -n 's/^PKG_VERSION:=//p' "$PKG/Makefile")
+          release=$(sed -n 's/^PKG_RELEASE:=//p' "$PKG/Makefile")
+          if ! echo "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error file=$PKG/Makefile::PKG_VERSION non valida: '$version' (atteso X.Y.Z)"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "release=${release:-1}" >> "$GITHUB_OUTPUT"
+          echo "Versione: $version-r${release:-1}"
+
+      - name: Sintassi JavaScript
+        run: |
+          find "$PKG/htdocs" -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Traduzioni
+        run: |
+          sudo apt-get install -y -qq gettext >/dev/null
+          for po in "$PKG"/po/*/*.po; do
+            msgfmt --check-format -o /dev/null "$po"
+          done
+
+      - name: Script uci-defaults
+        run: |
+          for f in "$PKG"/root/etc/uci-defaults/*; do
+            sh -n "$f"
+            test -x "$f" || { echo "::error file=$f::manca il permesso di esecuzione"; exit 1; }
+          done
+
+  build:
+    name: SDK ${{ matrix.sdk }}
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - x86_64-24.10.8
+          - x86_64-25.12.6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compila
+        uses: openwrt/gh-action-sdk@v9
+        env:
+          ARCH: ${{ matrix.sdk }}
+          FEEDNAME: ninux
+          PACKAGES: ${{ env.PKG }}
+          V: s
+
+      - name: Elenca i pacchetti
+        run: |
+          ls -l bin/packages/*/ninux/
+          compgen -G "bin/packages/*/ninux/${PKG}[-_]*.[ai]pk" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.sdk }}
+          path: |
+            bin/packages/*/ninux/*.apk
+            bin/packages/*/ninux/*.ipk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: logs-${{ matrix.sdk }}
+          path: logs/
+
+  release:
+    name: Release
+    needs: [lint, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.lint.outputs.version }}
+      RELEASE: ${{ needs.lint.outputs.release }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag già presente?
+        id: tag
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "Il tag v$VERSION esiste già: nessuna nuova release."
+            echo "exists=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@v4
+        if: steps.tag.outputs.exists != '1'
+        with:
+          pattern: packages-*
+          path: dist
+          merge-multiple: true
+
+      - name: Crea tag e release
+        if: steps.tag.outputs.exists != '1'
+        run: |
+          find dist -type f \( -name '*.apk' -o -name '*.ipk' \) -exec mv {} dist/ \;
+          ls -l dist/*.apk dist/*.ipk
+          cat > notes.md <<EOF
+          Pacchetti di **$PKG $VERSION-r$RELEASE** (architettura \`all\`/\`noarch\`, vanno bene per ogni router).
+
+          - OpenWrt **25.12**: file \`.apk\`
+            \`\`\`
+            apk add --allow-untrusted ./$PKG-$VERSION-r$RELEASE.apk
+            \`\`\`
+          - OpenWrt **24.10**: file \`.ipk\`
+            \`\`\`
+            opkg install ./${PKG}_$VERSION-r${RELEASE}_all.ipk
+            \`\`\`
+
+          La traduzione italiana è il pacchetto \`luci-i18n-ninux-it\`.
+          EOF
+          gh release create "v$VERSION" dist/*.apk dist/*.ipk \
+            --target "$GITHUB_SHA" \
+            --title "$PKG $VERSION" \
+            --notes-file notes.md

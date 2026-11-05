@@ -2,6 +2,8 @@
 
 [🇮🇹 Italiano](README.md) · 🇬🇧 English
 
+[![CI](https://github.com/mikysal78/luci-theme-ninux/actions/workflows/ci.yml/badge.svg)](https://github.com/mikysal78/luci-theme-ninux/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/mikysal78/luci-theme-ninux)](https://github.com/mikysal78/luci-theme-ninux/releases/latest)
+
 A lightweight, simpler LuCI theme (OpenWrt 24.10 / 25.12) with a top menu bar
 (like Bootstrap) and a **Basic / Advanced** switch in the header:
 
@@ -35,6 +37,16 @@ reachable by URL; real permissions are LuCI's users and rpcd ACLs.
 With OpenWISP, use the `luci-theme-ninux.json` template in the `openwisp2`
 repository (variables `luci_logo`, `luci_brand`, `luci_accent`,
 `luci_accent_dark`, `luci_mode`).
+
+## Install
+
+Each version has a [Release](https://github.com/mikysal78/luci-theme-ninux/releases)
+with ready-made packages (arch `all`): `apk add --allow-untrusted ./luci-theme-ninux-<version>-r1.apk`
+on OpenWrt 25.12, `opkg install ./luci-theme-ninux_<version>-r1_all.ipk` on 24.10.
+
+CI (GitHub Actions) builds the package with the 24.10 and 25.12 SDKs on every
+push; bumping `PKG_VERSION` in the `Makefile` and pushing to `main` creates the
+`v<version>` tag and Release.
 
 ## Build
 

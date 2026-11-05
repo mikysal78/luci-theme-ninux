@@ -2,6 +2,8 @@
 
 🇮🇹 Italiano · [🇬🇧 English](README.en.md)
 
+[![CI](https://github.com/mikysal78/luci-theme-ninux/actions/workflows/ci.yml/badge.svg)](https://github.com/mikysal78/luci-theme-ninux/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/mikysal78/luci-theme-ninux)](https://github.com/mikysal78/luci-theme-ninux/releases/latest)
+
 > 📖 Questo repository fa parte dell'infrastruttura di **NINUX Basilicata**: la guida per ricostruirla tutta, passo passo (Proxmox, DNS, OpenWISP, moduli, firmware, app), è su **[GitHub Pages](https://mikysal78.github.io/ninux-basilicata-infra/)**.
 
 Un tema per LuCI (OpenWrt 24.10 / 25.12) **leggero** e **più semplice** di
@@ -123,7 +125,27 @@ con le variabili `luci_logo`, `luci_brand`, `luci_accent`, `luci_accent_dark`
 (default del template). Si cambiano per tutti dal playbook, o per un router
 nelle variabili del device.
 
+## Installazione dai pacchetti pronti
+
+Ogni versione ha la sua [Release](https://github.com/mikysal78/luci-theme-ninux/releases)
+con i pacchetti già compilati (architettura `all`, vanno bene per ogni router):
+
+```sh
+# OpenWrt 25.12
+apk add --allow-untrusted ./luci-theme-ninux-<versione>-r1.apk
+# OpenWrt 24.10
+opkg install ./luci-theme-ninux_<versione>-r1_all.ipk
+```
+
+La traduzione italiana è il pacchetto `luci-i18n-ninux-it`, nella stessa Release.
+
 ## Compilazione
+
+La CI (GitHub Actions) controlla il codice e compila il pacchetto con l'SDK di
+OpenWrt 24.10 e 25.12 a ogni push; i pacchetti restano scaricabili tra gli
+artifact dell'esecuzione. Per pubblicare una versione basta alzare
+`PKG_VERSION` nel `Makefile` e fare push su `main`: la CI crea il tag
+`v<versione>` e la Release con i pacchetti.
 
 Come feed (consigliato), in `feeds.conf`:
 
