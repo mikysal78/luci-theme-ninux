@@ -114,16 +114,19 @@ uci commit luci
 ```
 
 Un logo esterno (`https://…`) richiede che chi apre LuCI raggiunga quel server;
-per un router isolato conviene un percorso locale o un `data:` URI.
+per un router isolato conviene un percorso locale o un `data:` URI. Il logo si
+vede alto 28 pixel e largo al massimo 220 (24 × 150 sul telefono).
 
 ### Con OpenWISP
 
 Nel repo `openwisp2` c'è il template **Tema LuCI ninux**
 (`openwisp-templates/luci-theme-ninux.json`): scrive la sezione `luci.ninux`
-con le variabili `luci_logo`, `luci_brand`, `luci_accent`, `luci_accent_dark`
-(dal contesto globale del playbook, variabili `ninux_luci_*`) e `luci_mode`
-(default del template). Si cambiano per tutti dal playbook, o per un router
-nelle variabili del device.
+con le variabili `luci_logo`, `luci_brand`, `luci_accent`, `luci_accent_dark`,
+`luci_mode` e `luci_allow_advanced`. I valori per tutti stanno nel contesto
+globale del playbook (variabili `ninux_luci_*`); per una singola
+organizzazione si scelgono logo (con l'upload), nome, colori e modalità con il
+modulo [openwisp-luci-theme](https://github.com/mikysal78/openwisp-luci-theme);
+per un solo router, nelle variabili del device.
 
 ## Installazione dai pacchetti pronti
 
@@ -164,7 +167,8 @@ oppure copiando (o collegando) la cartella `luci-theme-ninux/` in `package/`.
 La traduzione italiana (`luci-i18n-ninux-it`) si compila se nel firmware è
 attivo l'italiano (`CONFIG_LUCI_LANG_it`).
 
-Alla prima installazione il tema diventa quello predefinito; si cambia da
+Il tema si aggiunge a quelli già presenti (Bootstrap resta installato). Alla
+prima installazione diventa quello predefinito; si cambia da
 *Sistema → Sistema → Lingua e stile*. Disinstallandolo LuCI torna a Bootstrap.
 
 ## Note tecniche
