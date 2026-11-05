@@ -169,7 +169,17 @@ attivo l'italiano (`CONFIG_LUCI_LANG_it`).
 
 Il tema si aggiunge a quelli già presenti (Bootstrap resta installato). Alla
 prima installazione diventa quello predefinito; si cambia da
-*Sistema → Sistema → Lingua e stile*. Disinstallandolo LuCI torna a Bootstrap.
+*Sistema → Sistema → Lingua e stile*. Disinstallandolo LuCI torna al primo
+tema rimasto, di solito Bootstrap.
+
+Il pacchetto dipende da tutto quello che porta `luci-light` **tranne
+Bootstrap** (`luci-mod-admin-full`, `luci-proto-ipv6`, `luci-app-firewall`,
+`luci-proto-ppp`, `rpcd-mod-rrdns`, `uhttpd`, `uhttpd-mod-ubus`). Su un router
+con poca flash si può quindi avere LuCI completa senza Bootstrap: nel `.config`
+si seleziona `luci-theme-ninux` al posto di `luci`/`luci-light`, e
+`luci-theme-bootstrap` resta fuori. Per HTTPS e gestione pacchetti, quello che
+aggiungerebbe `luci-ssl`: `libustream-mbedtls`, `px5g-mbedtls` e
+`luci-app-package-manager`.
 
 ## Note tecniche
 

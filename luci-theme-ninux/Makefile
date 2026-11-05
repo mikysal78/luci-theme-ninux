@@ -6,9 +6,19 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Ninux Theme (lightweight, Basic/Advanced mode)
-LUCI_DEPENDS:=+luci-base
+# Tutto quello che porta luci-light tranne luci-theme-bootstrap: con questo
+# tema si può avere LuCI completa anche senza Bootstrap (router con poca flash).
+LUCI_DEPENDS:= \
+	+luci-base \
+	+luci-mod-admin-full \
+	+IPV6:luci-proto-ipv6 \
+	+luci-app-firewall \
+	+luci-proto-ppp \
+	+rpcd-mod-rrdns \
+	+uhttpd \
+	+uhttpd-mod-ubus
 
-PKG_VERSION:=0.2.0
+PKG_VERSION:=0.3.0
 PKG_RELEASE:=1
 PKG_LICENSE:=Apache-2.0
 
@@ -19,8 +29,11 @@ define Package/luci-theme-ninux/postrm
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] || {
 	uci -q delete luci.themes.Ninux
-	[ "$$(uci -q get luci.main.mediaurlbase)" = "/luci-static/ninux" ] && \
-		uci -q set luci.main.mediaurlbase=/luci-static/bootstrap
+	# torna al primo tema rimasto (Bootstrap, se c'è ancora)
+	if [ "$$(uci -q get luci.main.mediaurlbase)" = "/luci-static/ninux" ]; then
+		next=$$(uci -q show luci.themes | sed -n "s/^luci\.themes\.[^=]*='\(.*\)'$$/\1/p" | head -n 1)
+		uci -q set luci.main.mediaurlbase="$${next:-/luci-static/bootstrap}"
+	fi
 	uci commit luci
 }
 endef

@@ -174,7 +174,17 @@ the firmware (`CONFIG_LUCI_LANG_it`).
 
 The theme is added next to the default ones (Bootstrap stays installed). On
 first install it becomes the default theme; it can be changed in *System →
-System → Language and Style*. Uninstalling it, LuCI goes back to Bootstrap.
+System → Language and Style*. Uninstalling it, LuCI goes back to the first
+remaining theme, usually Bootstrap.
+
+The package depends on everything `luci-light` brings **except Bootstrap**
+(`luci-mod-admin-full`, `luci-proto-ipv6`, `luci-app-firewall`,
+`luci-proto-ppp`, `rpcd-mod-rrdns`, `uhttpd`, `uhttpd-mod-ubus`). On a router
+with little flash you can therefore have the full LuCI without Bootstrap:
+select `luci-theme-ninux` instead of `luci`/`luci-light` in `.config`, and
+`luci-theme-bootstrap` stays out. For HTTPS and package management, what
+`luci-ssl` would add: `libustream-mbedtls`, `px5g-mbedtls` and
+`luci-app-package-manager`.
 
 ## Technical notes
 
